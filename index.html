@@ -122,7 +122,7 @@
             }
         }
 
-        /* بەشی خوارەوە بۆ ڕاکێشان - تەنها کاتێک دەردەکەوێت کە نامەکان تەواو بن */
+        /* بەشی خوارەوە بۆ ڕاکێشان */
         .home-indicator-wrapper {
             position: absolute;
             bottom: 15px;
@@ -180,7 +180,7 @@
             transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* مۆسیقا کۆنتڕۆڵکەر شێوازی ئایفۆن (Apple Music Widget) */
+        /* مۆسیقا کۆنتڕۆڵکەر */
         .music-player-widget {
             background: rgba(255, 255, 255, 0.85);
             border-radius: 20px;
@@ -238,18 +238,12 @@
             font-size: 20px;
             color: #000;
             cursor: pointer;
-            transition: transform 0.1s ease;
-        }
-
-        .control-btn:active {
-            transform: scale(0.85);
         }
 
         .play-pause-btn {
             font-size: 24px;
         }
 
-        /* بەشی دەقی یاداشتەکە */
         .notes-container-box {
             flex: 1;
             display: flex;
@@ -280,7 +274,6 @@
             white-space: pre-line;
         }
 
-        /* کاتی هێنانی شاشەکە بۆ سەرەوە */
         .phone-container.unlocked .lock-screen {
             transform: translateY(-100%);
         }
@@ -295,32 +288,25 @@
 
     <div class="phone-container" id="phoneContainer">
         
-        <!-- شاشەی قفڵ -->
         <div class="lock-screen" id="lockScreen">
             <div class="lock-icon">🔒</div>
             <div class="time" id="live-time">14:05</div>
             <div class="date" id="live-date">شەممە، ١٨ی تەمموز</div>
 
-            <div class="notifications-container" id="notifBox">
-                <!-- نامەکان لێرە زیاد دەبن -->
-            </div>
+            <div class="notifications-container" id="notifBox"></div>
         </div>
 
-        <!-- بەشی ڕاکێشان بۆ سەرەوە -->
         <div class="home-indicator-wrapper" id="swipeWrapper">
             <div class="swipe-text">بۆ ئاشت بوونەوە بەرەو سەرەوە بڕکێنە 🔼</div>
             <div class="home-indicator"></div>
         </div>
 
-        <!-- ئەپی یاداشتەکان (Notes) بە کۆنتڕۆڵی مۆسیقای نایابەوە -->
         <div class="notes-app">
-            
-            <!-- Apple Music Player Widget -->
             <div class="music-player-widget">
                 <div class="player-info">
                     <div class="album-art"></div>
                     <div class="track-details">
-                        <span class="track-title" id="widgetTitle">لێم تۆرە مەبە ❤️</span>
+                        <span class="track-title">لێم تۆرە مەبە ❤️</span>
                         <span class="track-artist">بۆ تاقانەکەم</span>
                     </div>
                 </div>
@@ -331,7 +317,6 @@
                 </div>
             </div>
 
-            <!-- بەشی یاداشتەکە -->
             <div class="notes-container-box">
                 <div class="notes-header">📁 یاداشتەکانی دڵم</div>
                 <div class="notes-title">لێم ببوورە... 🥺❤️</div>
@@ -351,24 +336,21 @@
 
     </div>
 
-    <!-- فایلی دەنگی مۆسیقاکە لە گیتهەب -->
-    <audio id="bgMusic" src="music.mp3" loop></audio>
+    <!-- فایلی دەنگی مۆسیقاکە -->
+    <audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
 
     <script>
-        // کات و بەرواری ڕاستەقینە
         function updateClock() {
             const now = new Date();
             let hours = now.getHours().toString().padStart(2, '0');
             let minutes = now.getMinutes().toString().padStart(2, '0');
             document.getElementById('live-time').innerText = `${hours}:${minutes}`;
-            
             const options = { weekday: 'long', day: 'numeric', month: 'long' };
             document.getElementById('live-date').innerText = now.toLocaleDateString('ku-IQ', options);
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // لیستی نامەکان
         const messages = [
             { app: "Snapchat 🟡", sender: "ژیانم ❤️", body: "هێشتا لێم تۆریاوی؟ 🥺", delay: 1500 },
             { app: "Snapchat 🟡", sender: "ژیانم ❤️", body: "زۆر بیرم دەکردیت... نەمزانی بێدەنگ بم.", delay: 3500 },
@@ -383,7 +365,13 @@
         const phoneContainer = document.getElementById('phoneContainer');
         const lockScreen = document.getElementById('lockScreen');
 
-        // نیشاندانی نامەکان بە دوای یەکدا
+        // ڕێگەدان بە وێبگەر بۆ کارپێکردنی دەنگ بە یەکەم دەست لێدان
+        document.body.addEventListener('touchstart', () => {
+            audio.play().then(() => {
+                audio.pause(); // تەنها بۆ ئەوەی ڕێگەی پێبدرێت و دواتر لە کاتی خۆیدا لێبدرێت
+            }).catch(e => console.log(e));
+        }, { once: true });
+
         messages.forEach((msg) => {
             setTimeout(() => {
                 const notif = document.createElement('div');
@@ -399,12 +387,10 @@
             }, msg.delay);
         });
 
-        // هێڵی خوارەوە تەنها دوای تەواوبوونی نامەکان دێت
         setTimeout(() => {
             swipeWrapper.classList.add('show');
         }, 8500);
 
-        // کۆنتڕۆڵی ڕاکێشان بەرەو سەرەوە (Swipe Up)
         let startY = 0;
         lockScreen.addEventListener('touchstart', (e) => {
             startY = e.touches[0].clientY;
@@ -412,10 +398,8 @@
 
         lockScreen.addEventListener('touchmove', (e) => {
             if(!swipeWrapper.classList.contains('show')) return;
-
             let moveY = e.touches[0].clientY;
             let diffY = startY - moveY;
-            
             if (diffY > 60) {
                 unlockPhone();
             }
@@ -424,17 +408,14 @@
         function unlockPhone() {
             if (!phoneContainer.classList.contains('unlocked')) {
                 phoneContainer.classList.add('unlocked');
-                
-                // لێدانی خۆکاری مۆسیقا
-                audio.play().then(() => {
-                    playPauseBtn.innerText = "⏸";
-                }).catch(err => {
-                    console.log("Audio needs user gesture.");
-                });
+                setTimeout(() => {
+                    audio.play().then(() => {
+                        playPauseBtn.innerText = "⏸";
+                    }).catch(err => console.log(err));
+                }, 300);
             }
         }
 
-        // کۆنتڕۆڵ کردنی پلەیەرەکە (Play / Pause)
         playPauseBtn.addEventListener('click', () => {
             if (audio.paused) {
                 audio.play();
