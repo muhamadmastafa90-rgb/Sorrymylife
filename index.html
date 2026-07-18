@@ -2,98 +2,109 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شاشەی قفڵ - داوای لێبوردن</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iOS Lock Screen</title>
     <style>
+        /* ڕێکخستنی سەرەکی بۆ مۆبایل */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
         }
 
-        /* شاشەی مۆبایل */
+        /* شاشەی مۆبایل بە تەواوی قەبارە */
         .phone-container {
-            width: 375px;
-            height: 812px;
-            background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000') center/cover;
+            width: 100%;
+            height: 100%;
             position: relative;
-            border-radius: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000') center/cover no-repeat;
             overflow: hidden;
-            border: 8px solid #333;
-            transition: all 0.5s ease;
         }
 
         /* شاشەی قفڵ */
         .lock-screen {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 60px;
-            background: rgba(0, 0, 0, 0.2);
-            z-index: 2;
-            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+            padding-top: 50px;
+            background: rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
         }
 
         .lock-icon {
-            font-size: 24px;
-            color: white;
-            margin-bottom: 10px;
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 5px;
+            animation: lockBounce 2s infinite;
+        }
+
+        @keyframes lockBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
 
         .time {
-            font-size: 75px;
-            font-weight: 200;
-            color: rgba(255, 255, 255, 0.9);
+            font-size: 72px;
+            font-weight: 300;
+            color: #fff;
             line-height: 1;
+            letter-spacing: -1px;
         }
 
         .date {
-            font-size: 16px;
+            font-size: 17px;
+            font-weight: 500;
             color: rgba(255, 255, 255, 0.9);
-            margin-top: 5px;
+            margin-top: 6px;
         }
 
         /* نۆتیفیکەیشنەکان */
         .notifications-container {
-            width: 90%;
-            margin-top: 40px;
+            width: 92%;
+            margin-top: 30px;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            max-height: 60%;
+            overflow-y: auto;
         }
 
         .notification {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 18px;
-            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 19px;
+            padding: 14px 16px;
             width: 100%;
             opacity: 0;
-            transform: translateY(-20px);
-            animation: fadeInNotif 0.5s forwards;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transform: scale(0.9) translateY(-10px);
+            animation: fadeInUpNotif 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 0.5px solid rgba(255,255,255,0.2);
         }
 
         .notif-header {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            color: #333;
+            color: #222;
             margin-bottom: 4px;
             font-weight: 600;
         }
@@ -102,101 +113,120 @@
             font-size: 14px;
             color: #000;
             font-weight: 500;
+            line-height: 1.3;
         }
 
-        @keyframes fadeInNotif {
+        @keyframes fadeInUpNotif {
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: scale(1) translateY(0);
             }
         }
 
-        /* دوگمەی ڕاکێشان بۆ کردنەوە */
-        .swipe-up-btn {
+        /* خەتی هۆم لە خوارەوە (iOS Home Bar) */
+        .home-indicator-wrapper {
             position: absolute;
-            bottom: 40px;
-            color: white;
-            font-size: 14px;
-            text-align: center;
+            bottom: 12px;
             width: 100%;
-            cursor: pointer;
-            opacity: 0;
-            animation: pulse 2s infinite 4s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            z-index: 11;
+            pointer-events: none;
         }
 
-        @keyframes pulse {
-            0% { opacity: 0.3; transform: translateY(0); }
-            50% { opacity: 0.9; transform: translateY(-5px); }
-            100% { opacity: 0.3; transform: translateY(0); }
+        .swipe-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            animation: textPulse 2s infinite;
         }
 
-        /* ئەپی نۆت (یاداشتەکان) */
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.9; }
+        }
+
+        .home-indicator {
+            width: 140px;
+            height: 5px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+
+        /* ئەپی نۆتی ئایفۆن (یاداشتەکان) */
         .notes-app {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             background: #f4f3f9;
-            z-index: 1;
-            padding: 50px 20px 20px 20px;
+            z-index: 5;
+            padding: 60px 24px 40px 24px;
             display: flex;
             flex-direction: column;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transform: scale(1.05);
+            transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .notes-header {
             display: flex;
             align-items: center;
             color: #dca842;
-            font-size: 16px;
-            margin-bottom: 20px;
-            font-weight: bold;
+            font-size: 17px;
+            margin-bottom: 24px;
+            font-weight: 600;
         }
 
         .notes-title {
-            font-size: 26px;
-            font-weight: bold;
+            font-size: 28px;
+            font-weight: 700;
             color: #000;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
         .notes-content {
             font-size: 16px;
             line-height: 1.6;
-            color: #333;
+            color: #2c2c2e;
             white-space: pre-line;
             overflow-y: auto;
+            flex: 1;
         }
 
-        /* کاتێک شاشەکە دەکرێتەوە */
-        .unlocked .lock-screen {
+        /* کاتی هێنانی شاشەکە بۆ سەرەوە */
+        .phone-container.unlocked .lock-screen {
             transform: translateY(-100%);
         }
-        .unlocked .notes-app {
+        
+        .phone-container.unlocked .notes-app {
             opacity: 1;
+            transform: scale(1);
         }
     </style>
 </head>
 <body>
 
-    <div class="phone-container" id="phone">
+    <div class="phone-container" id="phoneContainer">
         
-        <div class="lock-screen">
+        <div class="lock-screen" id="lockScreen">
             <div class="lock-icon">🔒</div>
             <div class="time" id="live-time">14:05</div>
-            <div class="date">شەممە، ١٨ی تەمموز</div>
+            <div class="date" id="live-date">شەممە، ١٨ی تەمموز</div>
 
-            <div class="notifications-container" id="notif-box">
+            <div class="notifications-container" id="notifBox">
                 </div>
+        </div>
 
-            <div class="swipe-up-btn" id="swipe-btn" onclick="unlockPhone()">
-                <span>🔼</span>
-                <span>ڕاکێشە بۆ ئاشت بوونەوە</span>
-            </div>
+        <div class="home-indicator-wrapper">
+            <div class="swipe-text" id="swipeText">بۆ کردنەوە بەرەو سەرەوە بڕکێنە</div>
+            <div class="home-indicator"></div>
         </div>
 
         <div class="notes-app">
@@ -217,31 +247,35 @@
 
     </div>
 
-    <audio id="bg-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+    <audio id="bgMusic" src="music.mp3" loop></audio>
 
     <script>
-        // نوێکردنەوەی کاتی مۆبایلەکە بەپێی کاتی ڕاستەقینە
-        function updateTime() {
+        // کات و بەرواری ڕاستەقینەی کوردی
+        function updateClock() {
             const now = new Date();
             let hours = now.getHours().toString().padStart(2, '0');
             let minutes = now.getMinutes().toString().padStart(2, '0');
             document.getElementById('live-time').innerText = `${hours}:${minutes}`;
+            
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            const dateStr = now.toLocaleDateString('ku-IQ', options);
+            document.getElementById('live-date').innerText = dateStr;
         }
-        setInterval(updateTime, 1000);
-        updateTime();
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // لیستی ئەو نامانەی کە دێن
+        // لیستی نامە کورتەکان
         const messages = [
             { app: "Snapchat 🟡", sender: "ژیانم ❤️", body: "هێشتا لێم تۆریاوی؟ 🥺", delay: 1500 },
-            { app: "Snapchat 🟡", sender: "ژیانم ❤️", body: "زۆر بیرم دەکردیت... نەمزانی بێدەنگ بم.", delay: 3500 },
+            { app: "Snapchat 🟡", sender: "ژیانm ❤️", body: "زۆر بیرم دەکردیت... نەمزانی بێدەنگ بم.", delay: 3500 },
             { app: "Snapchat 🟡", sender: "ژیانم ❤️", body: "دەزانم دڵتم ڕەنجاندووە، بەڵام زۆر پەشیمانم.", delay: 5500 },
-            { app: "Messages 💬", sender: "دڵەکەم", body: "تکایە با ئاشت بینەوە... خوارەوە بکەرەوە با قسە بکەین. ❤️", delay: 8000 }
+            { app: "Messages 💬", sender: "دڵەکەم", body: "تکایە با ئاشت بینەوە... شاشەکە بکەرەوە با قسە بکەین. ❤️", delay: 7500 }
         ];
 
-        const notifBox = document.getElementById('notif-box');
-        const music = document.getElementById('bg-music');
+        const notifBox = document.getElementById('notifBox');
+        const swipeText = document.getElementById('swipeText');
 
-        // نیشاندانی نامەکان یەک لە دوای یەک
+        // ناردنی نامەکان بە دوای یەکدا
         messages.forEach((msg) => {
             setTimeout(() => {
                 const notif = document.createElement('div');
@@ -254,22 +288,40 @@
                     <div class="notif-body">${msg.body}</div>
                 `;
                 notifBox.appendChild(notif);
-                
-                // لێدانی دەنگی نۆتیفیکەیشن ئەگەر بتهەوێت (لێرەدا دەتوانیت دەنگ دابنێیت)
             }, msg.delay);
         });
 
-        // دەرکەوتنی دوگەمەی کردنەوە دوای تەواوبوونی نامەکان
+        // دەرکەوتنی نووسینی "ڕاکێشە بۆ سەرەوە" دوای نامەکان
         setTimeout(() => {
-            document.getElementById('swipe-btn').style.opacity = "1";
-        }, 9000);
+            swipeText.style.opacity = "1";
+        }, 8500);
 
-        // فەرمانی کردنەوەی شاشەکە و لێدانی مۆسیقا
-        function unlockPhone() {
-            document.getElementById('phone').classList.add('unlocked');
-            music.play().catch(error => {
-                console.log("پێویستە بەکارهێنەر کلیک بکات بۆ لێدانی مۆسیقا بەهۆی یاساکانی وێبگەرەوە.");
-            });
+        // سیستەمی Swipe Up (بڕکاندن بەرەو سەرەوە) بۆ مۆبایل
+        let startY = 0;
+        const lockScreen = document.getElementById('lockScreen');
+        const phoneContainer = document.getElementById('phoneContainer');
+        const audio = document.getElementById('bgMusic');
+
+        lockScreen.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        lockScreen.addEventListener('touchmove', (e) => {
+            let moveY = e.touches[0].clientY;
+            let diffY = startY - moveY;
+            
+            // ئەگەر بەرەو سەرەوە کێشرا
+            if (diffY > 60) {
+                unlockActions();
+            }
+        }, { passive: true });
+
+        function unlockActions() {
+            if (!phoneContainer.classList.contains('unlocked')) {
+                phoneContainer.classList.add('unlocked');
+                // لێدانی مۆسیقا لەگەڵ کردنەوەی شاشە
+                audio.play().catch(err => console.log("Audio play blocked until user interaction"));
+            }
         }
     </script>
 </body>
