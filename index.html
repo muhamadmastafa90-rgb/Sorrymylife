@@ -323,7 +323,7 @@
                 <div class="notes-content">
                     هەناسەکەم،
                     
-                    کاتێک لێت زویر دەبم، هەست دەکەم هەوا نامێنێت بۆ هەناسەدان. دونیا هەرچەندە گەورەیە، بەڵام بێ زەردەخەنەی تۆ لە چاومدا زۆر بچووک و تاریکە.
+                    کاتێک لێت زویر دەبم، هەست دەکەم هەوا نامێنێت بۆ هەناسەدان. دونیا هەرچەندە گەورەیە، بەڵام بێ زەردەخەنەی تۆ لە چاومدا زویر و تاریکە.
                     
                     دەزانم ڕەنگە دڵتم ڕەنجاندبێت، بەڵام باوەڕ بکە خۆشمەوێیت بۆیە لە هەموو هەڵەیەک گەورەترم. تۆ ئەو پارچە گرنگەی ژیانمی کە ناتوانم بۆ یەک چرکەش لەدەستی بدەم.
                     
@@ -365,13 +365,6 @@
         const phoneContainer = document.getElementById('phoneContainer');
         const lockScreen = document.getElementById('lockScreen');
 
-        // ڕێگەدان بە وێبگەر بۆ کارپێکردنی دەنگ بە یەکەم دەست لێدان
-        document.body.addEventListener('touchstart', () => {
-            audio.play().then(() => {
-                audio.pause(); // تەنها بۆ ئەوەی ڕێگەی پێبدرێت و دواتر لە کاتی خۆیدا لێبدرێت
-            }).catch(e => console.log(e));
-        }, { once: true });
-
         messages.forEach((msg) => {
             setTimeout(() => {
                 const notif = document.createElement('div');
@@ -392,8 +385,21 @@
         }, 8500);
 
         let startY = 0;
+        let isAudioUnlocked = false;
+
+        // فێڵە سەرەکییەکە لێرەدایە: هەر کەمێک پەنجە بەر شاشە بکەوێت بۆ ڕاکێشان، دەنگەکە یەکسەر چالاک دەبێت
         lockScreen.addEventListener('touchstart', (e) => {
             startY = e.touches[0].clientY;
+            
+            if (!isAudioUnlocked) {
+                audio.play().then(() => {
+                    // ئەگەر هێشتا نەکرابووەوە، دەنگەکە کپ دەکەین تا کاتی گونجاو
+                    if (!phoneContainer.classList.contains('unlocked')) {
+                        audio.pause();
+                    }
+                    isAudioUnlocked = true;
+                }).catch(err => console.log("تەزووی دەنگ ئامادەکرا"));
+            }
         }, { passive: true });
 
         lockScreen.addEventListener('touchmove', (e) => {
@@ -408,11 +414,18 @@
         function unlockPhone() {
             if (!phoneContainer.classList.contains('unlocked')) {
                 phoneContainer.classList.add('unlocked');
+                
+                // یەکسەر لێرەدا بە ئۆتۆماتیکی گۆرانییەکە لێدەدات بێ ئەوەی پێویست بە دەستلێدان بکات
                 setTimeout(() => {
                     audio.play().then(() => {
                         playPauseBtn.innerText = "⏸";
-                    }).catch(err => console.log(err));
-                }, 300);
+                    }).catch(err => {
+                        // ئەگەر وێبگەرەکە ڕێگەی نەدا، وەک چەرخەی دووەم لێی دەداتەوە
+                        audio.currentTime = 0;
+                        audio.play();
+                        playPauseBtn.innerText = "⏸";
+                    });
+                }, 200);
             }
         }
 
